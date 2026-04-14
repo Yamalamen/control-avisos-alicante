@@ -10,8 +10,8 @@ def authenticate(username: str, password: str):
         user = conn.execute(
             text(
                 """
-                SELECT username, full_name, role, email, active, password_hash
-                FROM users
+                SELECT username, full_name, "role" AS role, email, active, password_hash
+                FROM "users"
                 WHERE username = :username
                 """
             ),
@@ -30,10 +30,10 @@ def list_users():
         rows = conn.execute(
             text(
                 """
-                SELECT username, full_name, role, email, active, created_at
-                FROM users
+                SELECT username, full_name, "role" AS role, email, active, created_at
+                FROM "users"
                 ORDER BY
-                    CASE role WHEN 'Supervisor' THEN 1 ELSE 2 END,
+                    CASE "role" WHEN 'Supervisor' THEN 1 ELSE 2 END,
                     full_name
                 """
             )
@@ -44,7 +44,7 @@ def list_users():
 def update_user_email(username: str, email: str) -> None:
     with get_connection() as conn:
         conn.execute(
-            text("UPDATE users SET email = :email WHERE username = :username"),
+            text('UPDATE "users" SET email = :email WHERE username = :username'),
             {"email": email.strip(), "username": username},
         )
 
@@ -52,6 +52,6 @@ def update_user_email(username: str, email: str) -> None:
 def change_password(username: str, new_password: str) -> None:
     with get_connection() as conn:
         conn.execute(
-            text("UPDATE users SET password_hash = :password_hash WHERE username = :username"),
+            text('UPDATE "users" SET password_hash = :password_hash WHERE username = :username'),
             {"password_hash": hash_password(new_password), "username": username},
         )
