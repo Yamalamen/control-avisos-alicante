@@ -318,30 +318,51 @@ def seed_users(conn: Connection) -> None:
     ]
 
     for username, full_name, role, email, mobile_phone, password in users:
-        conn.execute(
+        existing_user = conn.execute(
             text(
                 """
-                INSERT INTO users (username, full_name, role, email, mobile_phone, password_hash)
-                VALUES (:username, :full_name, :role, :email, :mobile_phone, :password_hash)
-                ON CONFLICT(username) DO UPDATE SET
-                    full_name = EXCLUDED.full_name,
-                    role = EXCLUDED.role,
-                    email = CASE
-                        WHEN COALESCE(users.email, '') = '' THEN EXCLUDED.email
-                        ELSE users.email
-                    END,
-                    mobile_phone = CASE
-                        WHEN COALESCE(users.mobile_phone, '') = '' THEN EXCLUDED.mobile_phone
-                        ELSE users.mobile_phone
-                    END
+                SELECT id, email, mobile_phone
+                FROM users
+                WHERE username = :username
                 """
             ),
-            {
-                "username": username,
-                "full_name": full_name,
-                "role": role,
-                "email": email,
-                "mobile_phone": mobile_phone,
-                "password_hash": hash_password(password),
-            },
-        )
+            {"username": username},
+        ).mappings().first()
+
+        params = {
+            "username": username,
+            "full_name": full_name,
+            "role": role,
+            "email": email,
+            "mobile_phone": mobile_phone,
+            "password_hash": hash_password(password),
+        }
+
+        if existing_user:
+            conn.execute(
+                text(
+                    """
+                    UPDATE users
+                    SET full_name = :full_name,
+                        role = :role,
+                        email = :email,
+                        mobile_phone = :mobile_phone
+                    WHERE username = :username
+                    """
+                ),
+                {
+                    **params,
+                    "email": existing_user["email"] or email,
+                    "mobile_phone": existing_user["mobile_phone"] or mobile_phone,
+                },
+            )
+        else:
+            conn.execute(
+                text(
+                    """
+                    INSERT INTO users (username, full_name, role, email, mobile_phone, password_hash)
+                    VALUES (:username, :full_name, :role, :email, :mobile_phone, :password_hash)
+                    """
+                ),
+                params,
+            )
