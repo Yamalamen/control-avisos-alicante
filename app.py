@@ -187,6 +187,8 @@ def render_notice_detail():
     st.write(f"**E.S.M.:** {notice['esm']}")
     st.write(f"**Descripción:** {notice['work_description']}")
     st.write(f"**Oficio:** {notice['oficio']}")
+    user_options = list_users()
+    notify_options = [""] + [user["username"] for user in user_options]
 
     with st.form("notice_form"):
         status = st.radio(
@@ -200,6 +202,12 @@ def render_notice_detail():
             "Asignar coordinador",
             coordinator_options,
             index=coordinator_options.index(notice["assigned_coordinator"]) if notice["assigned_coordinator"] in coordinator_options else 0,
+        )
+        notify_username = st.selectbox(
+            "Notificar a usuario",
+            notify_options,
+            index=0,
+            help="Envía una notificación en la app y por correo al usuario seleccionado con el resumen del aviso y sus comentarios.",
         )
         drive_url = st.text_input("Enlace de Drive", value=notice["drive_url"] or "")
         observations = st.text_area("Observaciones", value=notice["observations"] or "", height=120)
@@ -218,6 +226,7 @@ def render_notice_detail():
                 notice_id,
                 status=status,
                 assigned_coordinator=assigned_coordinator,
+                notify_username=notify_username,
                 drive_url=drive_url,
                 observations=observations,
                 material_notes=material_notes,

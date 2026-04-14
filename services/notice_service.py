@@ -246,6 +246,7 @@ def update_notice(
     *,
     status: str,
     assigned_coordinator: str,
+    notify_username: str,
     drive_url: str,
     observations: str,
     material_notes: str,
@@ -305,6 +306,17 @@ def update_notice(
                 ),
                 {"notice_id": notice_id, "author": author, "comment": comment_text.strip()},
             )
+        comments_rows = conn.execute(
+            text(
+                """
+                SELECT author, comment, created_at
+                FROM comments
+                WHERE notice_id = :notice_id
+                ORDER BY created_at DESC
+                """
+            ),
+            {"notice_id": notice_id},
+        ).mappings().all()
 
     previous_coordinator = current.get("assigned_coordinator") or ""
     if assigned_coordinator and assigned_coordinator != previous_coordinator:
@@ -328,6 +340,23 @@ def update_notice(
             f"Contacto móvil asociado: +34 615890784."
         )
         notify_user("laura", title, body, notice_id)
+
+    if notify_username:
+        comments_lines = [
+            f"- {row['author']} ({row['created_at']}): {row['comment']}"
+            for row in comments_rows[:5]
+        ]
+        comments_block = "\n".join(comments_lines) if comments_lines else "- Sin comentarios"
+        body = (
+            f"Aviso {current['notice_number']}.\n"
+            f"Sede: {current.get('site') or 'Sin sede'}.\n"
+            f"Estado: {normalized_status}.\n"
+            f"Coordinador: {assigned_coordinator or 'Sin asignar'}.\n"
+            f"Observaciones: {observations.strip() or 'Sin observaciones'}.\n"
+            f"Material: {material_notes.strip() or 'Sin material pendiente'}.\n"
+            f"Comentarios:\n{comments_block}"
+        )
+        notify_user(notify_username, f"Aviso {current['notice_number']}", body, notice_id)
 
     sync_export_snapshot()
 
