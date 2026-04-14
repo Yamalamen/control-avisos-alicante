@@ -1,0 +1,27 @@
+APP DE CONTROL DE AVISOS - ARRANQUE
+
+1. Haz doble clic en ARRANCAR_AVISOS.bat
+2. Se abrira la app en:
+   http://localhost:8501
+
+USUARIOS INICIALES
+
+- jaime / jaime1234
+- luisreina / luis1234
+- gustavo / gustavo1234
+- fran / fran1234
+- andres / andres1234
+- jonatan / jonatan1234
+- laura / laura1234
+
+EMAILS
+
+1. Copia config_email.py.example a config_email.py
+2. Rellena los datos SMTP
+3. En la pantalla Usuarios añade el correo de cada persona
+
+ALERTAS
+
+- La app lanza alertas al abrirse
+- Tambien puedes ejecutar:
+  python run_alerts.py

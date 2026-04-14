@@ -1,0 +1,6 @@
+EMAIL_ENABLED = False
+SMTP_HOST = "smtp.office365.com"
+SMTP_PORT = 587
+SMTP_USER = "tu_correo@dominio.com"
+SMTP_PASSWORD = "tu_password"
+EMAIL_FROM = "tu_correo@dominio.com"

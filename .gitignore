@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+.venv_qgis/
+.vendor/
+.streamlit/secrets.toml
+config_email.py
+data/*.db
+data/*.xlsx
+!data/.gitkeep

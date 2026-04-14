@@ -1,0 +1,16 @@
+DESPLIEGUE EN NUBE
+
+1. Crear base de datos en Supabase
+2. Obtener la cadena DATABASE_URL
+3. Subir este proyecto a GitHub
+4. Crear la app en Streamlit Community Cloud
+5. Pegar DATABASE_URL y, si quieres, los datos SMTP en Secrets
+
+FICHERO DE REFERENCIA:
+
+- .streamlit/secrets.toml.example
+
+NOTA:
+
+- La app local sigue usando SQLite si no existe DATABASE_URL
+- En la nube usara Postgres automaticamente si DATABASE_URL esta presente
