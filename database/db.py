@@ -33,13 +33,13 @@ def ensure_data_dir() -> None:
 def get_database_url() -> str:
     env_url = os.getenv("DATABASE_URL", "").strip()
     if env_url:
-        return env_url
+        return normalize_database_url(env_url)
     try:
         import streamlit as st
 
         secret_url = str(st.secrets.get("DATABASE_URL", "")).strip()
         if secret_url:
-            return secret_url
+            return normalize_database_url(secret_url)
     except Exception:
         pass
     ensure_data_dir()
@@ -48,6 +48,14 @@ def get_database_url() -> str:
 
 def is_sqlite_url(database_url: str) -> bool:
     return database_url.startswith("sqlite:///")
+
+
+def normalize_database_url(database_url: str) -> str:
+    if database_url.startswith("postgresql://"):
+        return database_url.replace("postgresql://", "postgresql+psycopg://", 1)
+    if database_url.startswith("postgres://"):
+        return database_url.replace("postgres://", "postgresql+psycopg://", 1)
+    return database_url
 
 
 def get_engine() -> Engine:
