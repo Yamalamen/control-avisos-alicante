@@ -55,7 +55,7 @@ def mark_notification_read(notification_id: int) -> None:
 def get_user_email(username: str) -> str:
     with get_connection() as conn:
         row = conn.execute(
-            text('SELECT email FROM "users" WHERE username = :username'),
+            text("SELECT email FROM app_users WHERE username = :username"),
             {"username": username},
         ).mappings().first()
     return row["email"] if row and row["email"] else ""

@@ -82,7 +82,7 @@ def init_db() -> None:
             conn.execute(
                 text(
                     """
-                    CREATE TABLE IF NOT EXISTS "users" (
+                    CREATE TABLE IF NOT EXISTS app_users (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         username TEXT NOT NULL UNIQUE,
                         full_name TEXT NOT NULL,
@@ -171,7 +171,7 @@ def init_db() -> None:
             conn.execute(
                 text(
                     """
-                    CREATE TABLE IF NOT EXISTS "users" (
+                    CREATE TABLE IF NOT EXISTS app_users (
                         id BIGSERIAL PRIMARY KEY,
                         username TEXT NOT NULL UNIQUE,
                         full_name TEXT NOT NULL,
@@ -286,7 +286,7 @@ def ensure_user_columns(conn: Connection, sqlite_mode: bool) -> None:
     if sqlite_mode:
         columns = {
             row[1]
-            for row in conn.execute(text('PRAGMA table_info("users")')).fetchall()
+            for row in conn.execute(text("PRAGMA table_info(app_users)")).fetchall()
         }
     else:
         columns = {
@@ -296,14 +296,14 @@ def ensure_user_columns(conn: Connection, sqlite_mode: bool) -> None:
                     """
                     SELECT column_name
                     FROM information_schema.columns
-                    WHERE table_name = 'users'
+                    WHERE table_name = 'app_users'
                     """
                 )
             ).fetchall()
         }
 
     if "mobile_phone" not in columns:
-        conn.execute(text('ALTER TABLE "users" ADD COLUMN mobile_phone TEXT'))
+        conn.execute(text("ALTER TABLE app_users ADD COLUMN mobile_phone TEXT"))
 
 
 def seed_users(conn: Connection) -> None:
@@ -322,7 +322,7 @@ def seed_users(conn: Connection) -> None:
             text(
                 """
                 SELECT id, email, mobile_phone
-                FROM "users"
+                FROM app_users
                 WHERE username = :username
                 """
             ),
@@ -342,7 +342,7 @@ def seed_users(conn: Connection) -> None:
             conn.execute(
                 text(
                     """
-                    UPDATE "users"
+                    UPDATE app_users
                     SET full_name = :full_name,
                         "role" = :role,
                         email = :email,
@@ -360,7 +360,7 @@ def seed_users(conn: Connection) -> None:
             conn.execute(
                 text(
                     """
-                    INSERT INTO "users" (username, full_name, "role", email, mobile_phone, password_hash)
+                    INSERT INTO app_users (username, full_name, "role", email, mobile_phone, password_hash)
                     VALUES (:username, :full_name, :role, :email, :mobile_phone, :password_hash)
                     """
                 ),
