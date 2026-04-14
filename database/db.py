@@ -60,7 +60,10 @@ def normalize_database_url(database_url: str) -> str:
 
 def get_engine() -> Engine:
     database_url = get_database_url()
-    connect_args = {"check_same_thread": False} if is_sqlite_url(database_url) else {}
+    if is_sqlite_url(database_url):
+        connect_args = {"check_same_thread": False}
+    else:
+        connect_args = {"prepare_threshold": None}
     return create_engine(database_url, future=True, connect_args=connect_args)
 
 
